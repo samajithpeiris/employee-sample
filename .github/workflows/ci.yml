@@ -37,6 +37,17 @@ jobs:
       - name: Wait for services to be ready
         run: sleep 180
 
+      - name: Check if MongoDB Command Exists
+        run: |
+          if command -v mongo &> /dev/null
+          then
+            echo "MongoDB CLI is available."
+            mongo --version
+          else
+            echo "MongoDB CLI is NOT installed on this runner."
+            exit 1
+          fi
+
 
       # Run Playwright tests (assuming tests are in your project)
       - name: Run Playwright tests
