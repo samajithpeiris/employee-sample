@@ -35,7 +35,7 @@ jobs:
 
       # Wait for services to be ready (adjust sleep time if necessary)
       - name: Wait for services to be ready
-        run: sleep 100
+        run: sleep 180
 
 
       # Run Playwright tests (assuming tests are in your project)
