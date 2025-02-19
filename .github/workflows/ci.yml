@@ -1,29 +1,32 @@
-name: CI
+name: CI Pipeline
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+on: [push, pull_request]
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-22.04  # Use a stable version of Ubuntu
 
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-    services:
-      mongo:
-        image: mongo
-        ports:
-          - 27017:27017
-          # disable health check to speed up tests
-   #     options: >-
-    #      --health-cmd "mongo --eval 'db.runCommand({ ping: 1 })'" 
-     #     --health-interval 10s
-      #    --health-timeout 5s
-       #   --health-retries 5
+      # Install required dependencies
+      - name: Install Dependencies
+        run: sudo apt-get update && sudo apt-get install -y curl git
+      
+      # Install Docker Compose manually (since it's no longer pre-installed)
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose-plugin
 
-    steps:  
+      # Verify installation of Docker & Docker Compose
+      - name: Verify Docker and Docker Compose Installation
+        run: |
+          docker --version
+          docker compose version  # Uses the new syntax (without a hyphen)
+
+      # Install MongoDB 6.0
       - name: Install MongoDB
         run: |
           sudo apt-get update
@@ -43,37 +46,14 @@ jobs:
           sudo systemctl start mongod
           sudo systemctl enable mongod
 
+      # Build and start Docker containers
+      - name: Build and Run Containers
+        run: docker compose up --build -d
 
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      # Run backend tests inside the container
+      - name: Run Backend Tests
+        run: docker compose exec backend npm test
 
-      # Build and run containers using Docker Compose
-      - name: Set up Docker Compose
-        run: docker-compose --version
-
-      - name: Build and start containers
-        run: docker-compose up --build -d
-
-      # Wait for services to be ready (adjust sleep time if necessary)
-      - name: Wait for services to be ready
-        run: sleep 180
-
-      - name: Check if MongoDB Command Exists
-        run: |
-          if command -v mongo &> /dev/null
-          then
-            echo "MongoDB CLI is available."
-            mongo --version
-          else
-            echo "MongoDB CLI is NOT installed on this runner."
-            exit 1
-          fi
-
-
-      # Run Playwright tests (assuming tests are in your project)
-      - name: Run Playwright tests
-        run: npx playwright test --reporter=dot
-
-      # Shut down the containers after tests
-      - name: Shut down Docker Compose
-        run: docker-compose down
+      # Shut down containers after tests
+      - name: Shut Down Containers
+        run: docker compose down
