@@ -26,15 +26,20 @@ jobs:
       - name: Install MongoDB
         run: |
           sudo apt-get update
-          sudo apt-get install -y gnupg curl
+          sudo apt-get install -y gnupg curl lsb-release
+          sudo rm -f /usr/share/keyrings/mongodb-server-keyring.gpg
+          
           # Correctly import the MongoDB public key
           curl -fsSL https://pgp.mongodb.com/server-6.0.asc | sudo gpg --dearmor -o /usr/share/keyrings/mongodb-server-keyring.gpg
-          # Add the official MongoDB repository
-          echo "deb [signed-by=/usr/share/keyrings/mongodb-server-keyring.gpg] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+          
+          # Add MongoDB repository
+          echo "deb [signed-by=/usr/share/keyrings/mongodb-server-keyring.gpg] https://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+          
           sudo apt-get update
-          sudo apt-get install -y mongodb-org
+          sudo apt-get install -y --fix-broken mongodb-org || sudo apt-get -f install -y
           sudo systemctl start mongod
           sudo systemctl enable mongod
+
 
 
 
