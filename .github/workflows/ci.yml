@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      mongo:
+        image: mongo
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongo --eval 'db.runCommand({ ping: 1 })'" 
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Build and run containers using Docker Compose
+      - name: Set up Docker Compose
+        run: docker-compose --version
+
+      - name: Build and start containers
+        run: docker-compose up --build -d
+
+      # Wait for services to be ready (adjust sleep time if necessary)
+      - name: Wait for services to be ready
+        run: sleep 15
+
+      # Run Playwright tests (assuming tests are in your project)
+      - name: Run Playwright tests
+        run: npx playwright test --reporter=dot
+
+      # Shut down the containers after tests
+      - name: Shut down Docker Compose
+        run: docker-compose down

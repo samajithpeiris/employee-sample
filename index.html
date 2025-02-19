@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Employee Management System</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    #employee-form { margin-top: 20px; display: none; }
+    #employee-list { margin-top: 20px; }
+    .employee { margin-bottom: 15px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+    .employee-details { margin-bottom: 5px; }
+    .employee-buttons button { margin-right: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Employee Management System</h1>
+  <button id="add-employee-btn">Add Employee</button>
+  
+  <div id="employee-form">
+    <h2 id="form-title">Add Employee</h2>
+    <label>Employee ID: <input type="text" id="employee-id"></label><br>
+    <label>Name: <input type="text" id="employee-name"></label><br>
+    <label>Address: <input type="text" id="employee-address"></label><br>
+    <label>Salary: <input type="number" id="employee-salary"></label><br>
+    <button id="save-employee-btn">Save</button>
+    <button id="cancel-btn">Cancel</button>
+  </div>
+  
+  <div id="employee-list">
+    <h2>Employees</h2>
+    <ul id="list"></ul>
+  </div>
+  
+  <script>
+    const addEmployeeBtn = document.getElementById('add-employee-btn');
+    const employeeForm = document.getElementById('employee-form');
+    const saveEmployeeBtn = document.getElementById('save-employee-btn');
+    const cancelBtn = document.getElementById('cancel-btn');
+    const employeeList = document.getElementById('list');
+    
+    const employeeIdInput = document.getElementById('employee-id');
+    const employeeNameInput = document.getElementById('employee-name');
+    const employeeAddressInput = document.getElementById('employee-address');
+    const employeeSalaryInput = document.getElementById('employee-salary');
+    const formTitle = document.getElementById('form-title');
+    
+    // Variable to keep track if we're editing an employee
+    let currentEditItem = null;
+    
+    // Open form for adding a new employee
+    addEmployeeBtn.addEventListener('click', () => {
+      employeeForm.style.display = 'block';
+      formTitle.textContent = 'Add Employee';
+      saveEmployeeBtn.textContent = 'Save';
+      // Clear form fields
+      employeeIdInput.value = '';
+      employeeNameInput.value = '';
+      employeeAddressInput.value = '';
+      employeeSalaryInput.value = '';
+      currentEditItem = null;
+    });
+    
+    // Hide form when cancelling
+    cancelBtn.addEventListener('click', () => {
+      employeeForm.style.display = 'none';
+      currentEditItem = null;
+    });
+    
+    // Handle saving/updating an employee
+    saveEmployeeBtn.addEventListener('click', () => {
+      const idVal = employeeIdInput.value;
+      const nameVal = employeeNameInput.value;
+      const addressVal = employeeAddressInput.value;
+      const salaryVal = employeeSalaryInput.value;
+      
+      // Basic validation for name
+      if (nameVal.trim() === '') {
+        alert("Please enter employee's name.");
+        return;
+      }
+      
+      if (currentEditItem) {
+        // If editing, update the existing employee item
+        currentEditItem.querySelector('.employee-name').textContent = nameVal;
+        currentEditItem.querySelector('.employee-address').textContent = addressVal;
+        currentEditItem.querySelector('.employee-salary').textContent = salaryVal;
+      } else {
+        // Create a new employee item (li element)
+        const li = document.createElement('li');
+        li.classList.add('employee');
+        
+        // Create a container for details
+        const detailsDiv = document.createElement('div');
+        detailsDiv.classList.add('employee-details');
+        
+        // Create spans to hold employee details
+        const nameSpan = document.createElement('span');
+        nameSpan.classList.add('employee-name');
+        nameSpan.textContent = nameVal;
+        
+        const addressSpan = document.createElement('span');
+        addressSpan.classList.add('employee-address');
+        addressSpan.textContent = addressVal;
+        
+        const salarySpan = document.createElement('span');
+        salarySpan.classList.add('employee-salary');
+        salarySpan.textContent = salaryVal;
+        
+        detailsDiv.appendChild(nameSpan);
+        detailsDiv.appendChild(document.createTextNode(' | '));
+        detailsDiv.appendChild(addressSpan);
+        detailsDiv.appendChild(document.createTextNode(' | '));
+        detailsDiv.appendChild(salarySpan);
+        
+        // Create a container for buttons
+        const buttonsDiv = document.createElement('div');
+        buttonsDiv.classList.add('employee-buttons');
+        
+        // Create Edit button
+        const editBtn = document.createElement('button');
+        editBtn.textContent = 'Edit';
+        editBtn.addEventListener('click', () => {
+          // Pre-fill form with current employee details for editing
+          employeeForm.style.display = 'block';
+          formTitle.textContent = 'Edit Employee';
+          saveEmployeeBtn.textContent = 'Update';
+          employeeIdInput.value = idVal; // You can disable editing employee ID if needed
+          employeeNameInput.value = nameVal;
+          employeeAddressInput.value = addressVal;
+          employeeSalaryInput.value = salaryVal;
+          currentEditItem = li;
+        });
+        
+        // Create Delete button
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.addEventListener('click', () => {
+          employeeList.removeChild(li);
+        });
+        
+        buttonsDiv.appendChild(editBtn);
+        buttonsDiv.appendChild(deleteBtn);
+        
+        // Append details and buttons to the li
+        li.appendChild(detailsDiv);
+        li.appendChild(buttonsDiv);
+        
+        // Add the new employee to the list
+        employeeList.appendChild(li);
+      }
+      
+      // Hide form and clear fields after saving/updating
+      employeeForm.style.display = 'none';
+      employeeIdInput.value = '';
+      employeeNameInput.value = '';
+      employeeAddressInput.value = '';
+      employeeSalaryInput.value = '';
+      currentEditItem = null;
+    });
+  </script>
+</body>
+</html>

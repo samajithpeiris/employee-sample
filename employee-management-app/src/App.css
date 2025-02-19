@@ -1,0 +1,33 @@
+.App {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+}
+
+.form-container {
+  margin-bottom: 20px;
+}
+
+.form-container input {
+  margin-right: 10px;
+  padding: 5px;
+}
+
+.form-container button {
+  padding: 5px 10px;
+}
+
+.employee-list ul {
+  list-style: none;
+  padding: 0;
+}
+
+.employee-list li {
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.employee-list button {
+  margin-left: 10px;
+}

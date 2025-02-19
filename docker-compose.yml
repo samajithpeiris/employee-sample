@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  mongodb:
+    image: mongo
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  backend:
+    build: ./employee-backend
+    container_name: employee-backend
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongodb
+    environment:
+      # Set the MongoDB URI to use the 'mongodb' service from Compose
+      - MONGO_URI=mongodb://mongodb:27017/employees
+
+  frontend:
+    build: ./employee-management-app
+    container_name: employee-frontend
+    ports:
+      # Map port 80 in the container (served by Nginx) to port 3000 on your host
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  mongo-data:
