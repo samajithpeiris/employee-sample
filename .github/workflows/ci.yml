@@ -17,8 +17,8 @@ jobs:
       # Install Docker Compose manually (since it's no longer pre-installed)
       - name: Install Docker Compose
         run: |
-          sudo apt-get update
-          sudo apt-get install -y docker-compose-plugin
+          sudo curl -L "https://github
+
 
       # Verify installation of Docker & Docker Compose
       - name: Verify Docker and Docker Compose Installation
